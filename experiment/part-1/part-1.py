@@ -301,7 +301,7 @@ for thisTrial in trials:
     
     #-------Start Routine "trial"-------
     # Set the trial start time in local 24HR system time
-    trialStartTime = datetime.now().time()
+    trialStartTime = datetime.now()
     continueRoutine = True
     while continueRoutine and routineTimer.getTime() > 0:
         # get current time
@@ -415,7 +415,7 @@ for thisTrial in trials:
     # record our data
     # headers: trial,trialStartTime,image,emotion,locationPF,locationCoord,key_presses,key_presses_response_times,accuracy
     
-    trialData = [str(nTrial), str(trialStartTime), image, imageEmotion, str(imageLocation), str(location), str(key_resp_3.keys), str(key_resp_3.rt), str(accuracy)]
+    trialData = [str(nTrial), str(trialStartTime), str(image), str(imageEmotion), str(imageLocation), str(location), str(key_resp_3.keys), str(key_resp_3.rt), str(accuracy)]
     trialLogWriter.writerow(trialData)
     
     
