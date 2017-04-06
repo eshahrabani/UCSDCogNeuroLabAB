@@ -1,0 +1,4 @@
+experiment/part-1/data/
+experiment/part-2/data/
+*.pyc
+bin/StandalonePsychoPy-1.83.04-win32.exe
