@@ -16,19 +16,7 @@ from numpy import sin, cos, tan, log, log10, pi, average, sqrt, std, deg2rad, ra
 from numpy.random import random, randint, normal, shuffle, uniform, seed
 import os  # handy system and path functions
 import sys # to get file system encoding
-
-# Delete outdated constants after testing new ones.
-'''foveal_angle = 5.0                               # degrees
-peripheral_angle = 11.6
-distance_from_screen = 177.8                     # centimeters (65 in)
-cm_per_pixel = (56.5*2.54)/1920.0                # cm/pixel as per physical measurements 
-width_of_screen = 1920.0 * cm_per_pixel          # 143.51 cm
-height_of_screen = 1080.0 * cm_per_pixel         # 80.72  cm
-
-foveal_radius = 7.76          # should be calculated by hand        
-max_image_width =  18.06*1.5  # from peripheral angle
-peripheral_radius = height_of_screen/2.0 - (max_image_width/2.0)'''
-
+import csv
 
 ### EXPERIMENTAL CONSTANTS ###
 
@@ -59,7 +47,6 @@ height_of_screen = 1080.0 * cm_per_pixel # cm
 foveal_radius = 9.32 # should be calculated by hand on a calculator: r = dist * tan(f_r / 2)
 max_image_width = 2*foveal_radius # cm
 
-#peripheral_radius = height_of_screen/2.0 - (max_image_width/2.0) # cm
 peripheral_radius = 20.0
 
 ### END CALCULATIONS OF OTHER EXPERIMENTAL CONSTANTS ###
@@ -107,10 +94,14 @@ subject_folder_name = 'data/%s_%s/' %(expInfo['participant'], expInfo['date'])
 os.makedirs(_thisDir + os.sep + subject_folder_name)
 filename = _thisDir + os.sep + subject_folder_name + '%s_%s_%s' %(expInfo['participant'], expName, expInfo['date'])
 
+# Open the trialLog file and setup CSV writing to it.
+trialLogFile = open(filename + '_trialLog.csv', 'wb')
+trialLogWriter = csv.writer(trialLogFile)
 
-trialLogFile = open(filename + '_trialLog.csv', 'w')
-headers = 'trial,trialStartTime,image,emotion,locationPF,locationCoord,key_presses,key_presses_response_times,accuracy\n'
-trialLogFile.write(headers)
+# Write the headers for the trialLog file.
+headers = ['trial', 'trialStartTime', 'image', 'emotion', 'locationPF', 
+           'locationCoord', 'key_presses', 'key_presses_response_times,accuracy']
+trialLogWriter.writerow(headers)
 
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
@@ -422,15 +413,15 @@ for thisTrial in trials:
     
     
     # record our data
-    # headers: 'trial,trialStartTime,image,emotion,locationPF,locationCoord,key_presses,key_presses_response_times,accuracy'
-
-    trialData = str(nTrial) + ',' + str(trialStartTime) + ',' + image + ',' + imageEmotion + ',' + imageLocation + ',' + str(location) + ',' + str(key_resp_3.keys) + ',' + str(key_resp_3.rt) +  ',' + str(accuracy) + '\n'
-    trialLogFile.write(trialData)
+    # headers: trial,trialStartTime,image,emotion,locationPF,locationCoord,key_presses,key_presses_response_times,accuracy
+    
+    trialData = [str(nTrial), str(trialStartTime), image, imageEmotion, str(imageLocation), str(location), str(key_resp_3.keys), str(key_resp_3.rt), str(accuracy)]
+    trialLogWriter.writerow(trialData)
     
     
     thisExp.nextEntry()
     
 # completed 30 repeats of 'trials'
-
+trialLogFile.close()
 win.close()
 core.quit()
