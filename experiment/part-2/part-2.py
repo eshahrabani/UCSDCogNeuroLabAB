@@ -485,11 +485,11 @@ for thisTrial in trials:
         
         d_start_times.append(startTime)
         
-        if is_between(startTime, T1start, T1end) or is_between(endTime, T1start, T1end) or is_between(startTime, T2start, T2end) or is_between(endTime, T2start, T2end):
-            overlaps = True
+        #if is_between(startTime, T1start, T1end) or is_between(endTime, T1start, T1end) or is_between(startTime, T2start, T2end) or is_between(endTime, T2start, T2end):
+         #   overlaps = True
         
-        #if do_intervals_overlap(startTime, endTime, T1start, T1end) or do_intervals_overlap(startTime, endTime, T2start, T2end):
-          #  overlaps = True
+        if do_intervals_overlap(startTime, endTime, T1start, T1end) or do_intervals_overlap(startTime, endTime, T2start, T2end):
+            overlaps = True
         
         if startTime >= T2end:   # make sure not to display any distractors after T2 ends
             overlaps = True
@@ -800,7 +800,7 @@ for thisTrial in trials:
                 T2image,key_presses,key_presses_response_times, T1accuracy, T2accuracy'''
         
     trialData = [str(nTrial), str(trialStartTime), str(T1StartAbsolute), str(T1locationData), str(T1location), 
-                 str(T1emotionData), str(T1image), str(lag), str(T2StartAbsolute), str(T2location), str(T2emotionData), 
+                 str(T1emotionData), str(T1image), str(lag), str(T2StartAbsolute), str(T2locationData), str(T2location), str(T2emotionData), 
                  str(T2image), str(key_resp_3.keys), str(key_resp_3.rt), str(T1accuracy), str(T2accuracy)]
     trialLogWriter.writerow(trialData)
     
