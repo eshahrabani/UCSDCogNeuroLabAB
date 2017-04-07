@@ -20,6 +20,7 @@ from numpy import sin, cos, tan, log, log10, pi, average, sqrt, std, deg2rad, ra
 from numpy.random import random, randint, normal, shuffle, uniform, seed
 import os  # handy system and path functions
 import sys # to get file system encoding
+import csv
 
 # OSC imports 
 import time, threading
@@ -80,9 +81,12 @@ oscmsg.append(filename)
 oscSender.send(oscmsg)
 
 # Setup our main _trialLog.csv file and write its headers.
-trialLogFile = open(filename + '_trialLog.csv', 'w')
-headers = 'trial,trialStartTime,T1start,T1locationPF,T1locationCoord,T1emotion,T1image,lag,T2locationPF,T2locationCoord,T2emotion,T2image,key_presses,key_presses_response_times,T1accuracy,T2accuracy\n'
-trialLogFile.write(headers)
+trialLogFile = open(filename + '_trialLog.csv', 'wb')
+trialLogWriter = csv.writer(trialLogFile)
+headers = ['trial', 'trialStartTime', 'T1start', 'T1locationPF', 'T1locationCoord', 'T1emotion', 'T1image',
+           'lag', 'T2start', 'T2locationPF', 'T2locationCoord', 'T2emotion', 'T2image', 'key_presses', 'key_presses_response_times',
+           'T1accuracy', 'T2accuracy']
+trialLogWriter.writerow(headers)
 
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
@@ -146,11 +150,18 @@ def exit_exp():
 # Returns True if a is in between inclusive [x,y] for use in  distractor display. 
 def is_between(a, x, y):
     return (a >= x and a <= y)
+
+# Returns True if there is any overlap between intervals [x1,x2] and [y1,y2]
+#
+# Assume intervals are well-formed. 
+# If overlap, there is some number C in both ranges:
+# x1 <= C <= x2 AND y1 <= C <= y2
+#
+# Then: x1 <= y2 AND y1 <= x2
+def do_intervals_overlap(x1, x2, y1, y2):
+    return (x1 <= y2) and (y1 <= x2)
     
     
-    
-    
-   
 # -------------------------------------------------------- EXPERIMENT INITIALIZATION --------------------------------------------------------------
 
 logging.console.setLevel(logging.WARNING)  # this outputs to the screen, not a file
@@ -404,7 +415,7 @@ for thisTrial in trials:
     T1.setImage(T1image)
 
     # randomly pick lag
-    lags = range(100, 610, 20)    # range = 100-600 ms in steps of 20
+    lags = range(100, 700, 100)    # range = 100-600 ms in steps of 20
     lag = lags[randint(0, len(lags))] / 1000.0
     
 
@@ -449,6 +460,9 @@ for thisTrial in trials:
         
         if is_between(startTime, T1start, T1end) or is_between(endTime, T1start, T1end) or is_between(startTime, T2start, T2end) or is_between(endTime, T2start, T2end):
             overlaps = True
+        
+        #if do_intervals_overlap(startTime, endTime, T1start, T1end) or do_intervals_overlap(startTime, endTime, T2start, T2end):
+          #  overlaps = True
         
         if startTime >= T2end:   # make sure not to display any distractors after T2 ends
             overlaps = True
@@ -505,7 +519,11 @@ for thisTrial in trials:
     win.flip()
     
     # Set the trial start time in local 24HR system time
-    trialStartTime = datetime.now().time()
+    trialStartTime = str(datetime.now())
+    
+    # Holders for absolute T1 and T2 start times.
+    T1StartAbsolute = 0
+    T2StartAbsolute = 0
     
     # t=1 at the start of every trial
     t = 1.0
@@ -537,6 +555,7 @@ for thisTrial in trials:
             T1.tStart = t  # underestimates by a little under one frame
             T1.frameNStart = frameN  # exact frame index
             T1.setAutoDraw(True)
+            T1StartAbsolute = str(datetime.now())
         if T1.status == STARTED and t >= (T1start + (stimDuration-win.monitorFramePeriod*0.75)): #most of one frame period left
             T1.setAutoDraw(False)
         
@@ -546,6 +565,7 @@ for thisTrial in trials:
             T2.tStart = t  # underestimates by a little under one frame
             T2.frameNStart = frameN  # exact frame index
             T2.setAutoDraw(True)
+            T2StartAbsolute = str(datetime.now())
         if T2.status == STARTED and t >= (T2start + (stimDuration-win.monitorFramePeriod*0.75)): #most of one frame period left
             T2.setAutoDraw(False)
       
@@ -738,9 +758,9 @@ for thisTrial in trials:
                 T2correct += 1
                 
     
-    T1accuracy = T1correct / nTrial
-    T2accuracy = T2correct / nTrial
-    accuracy = (T1correct + T2correct) / (nTrial*2)
+    T1accuracy = T1correct / float(nTrial)
+    T2accuracy = T2correct / float(nTrial)
+    accuracy = (T1correct + T2correct) / float(nTrial*2)
     
     print "T1 accuracy: " + str(T1accuracy)
     print "T2 accuracy: " + str(T2accuracy)
@@ -748,10 +768,14 @@ for thisTrial in trials:
     print "\n\n"
         
     # record all data in our own log
-    # headers:'trial,trialStartTime,T1start,T1locationPF,T1locationCoord,T1emotion,T1image,lag,T2locationPF,T2locationCoord,T2emotion,T2image,key_presses,key_presses_response_times, T1accuracy, T2accuracy\n'
+    ''' headers:trial,trialStartTime,T1start,T1locationPF,T1locationCoord,
+                T1emotion,T1image,lag,T2start,T2locationPF,T2locationCoord,T2emotion,
+                T2image,key_presses,key_presses_response_times, T1accuracy, T2accuracy'''
         
-    trialData = str(nTrial) +  ',' + str(trialStartTime) + ',' + str(T1start) + ',' + str(T1locationData) +',' + str(T1location) + ',' + str(T1emotionData) +',' + T1image + ',' + str(lag) + ',' + str(T2locationData) +',' + str(T2location) + ',' + str(T2emotionData) +',' + T2image + ',' + str(key_resp_3.keys) + ',' + str(key_resp_3.rt) + ',' + str(T1accuracy) + ',' + str(T2accuracy) +'\n'          
-    trialLogFile.write(trialData)
+    trialData = [str(nTrial), str(trialStartTime), str(T1StartAbsolute), str(T1locationData), str(T1location), 
+                 str(T1emotionData), str(T1image), str(lag), str(T2StartAbsolute), str(T2location), str(T2emotionData), 
+                 str(T2image), str(key_resp_3.keys), str(key_resp_3.rt), str(T1accuracy), str(T2accuracy)]
+    trialLogWriter.writerow(trialData)
     
     # NEXT TRIAL!
     thisExp.nextEntry()
