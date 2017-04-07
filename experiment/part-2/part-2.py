@@ -40,9 +40,9 @@ _thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemen
 os.chdir(_thisDir)
 
 # Experiment constants.
-stimDuration = 0.130                                                          # Set the duration of each stimuli (i.e. T1, T2, and the distractors) in SECONDS. Default: 0.130 s (130 ms)
-key_resp_duration = 5                                                         # Set the amount of time the subject has to respond after T2 disappears (in SECONDS). Default: 5 s
-foveal_angle = 5.0                                                            # Set the foveal angle in degrees (the projection of the subject's fovea onto their visual field). Default: 5 degrees
+'''stimDuration = 0.130                                                          # Set the duration of each stimuli (i.e. T1, T2, and the distractors) in SECONDS. Default: 0.130 s (130 ms)
+key_resp_duration = 5.0                                                       # Set the amount of time the subject has to respond after T2 disappears (in SECONDS). Default: 5 s
+foveal_angle = 6.0                                                            # Set the foveal angle in degrees (the projection of the subject's fovea onto their visual field). Default: 5 degrees
 peripheral_angle = 11.6                                                       # Set the peripheral angle in degrees (the projection of the subject's periphery onto their visual field.). Default: 11.6 degrees. NOTE: This value isn't currently being used. 
 distance_from_screen = 177.8                                                  # Set the subject's eye distance from the center of the screen in CENTIMETERS. Default: 177.8 cm (65 in)
 cm_per_pixel = (56.5*2.54)/1920.0                                            # The number of CENTIMETERS each screen pixel occupies.
@@ -52,6 +52,33 @@ height_of_screen = 1080.0 * cm_per_pixel                                      # 
 foveal_radius = 7.76                                                          # abs(distance_from_screen * tan(foveal_angle/2.0)). Default: 7.76 cm
 max_image_width =  18.06*1.5                                                  # We pick a relatively arbitrary image size such that the subject's accuracy would be about 70% (validified during piloting with controls and autistic subjects).
 peripheral_radius = height_of_screen/2.0 - (max_image_width/2.0)             # The peripheral radius is derived from the height of the screen (which is smaller than the width of the screen) and the width of the image in order to maximize potential visual field space on the experiment display screen. 
+'''
+
+### EXPERIMENTAL CONSTANTS ###
+
+# Constants relevant to part 2 only.
+stimDuration = 0.130
+key_resp_duration = 5.0
+
+# Universal constants.
+foveal_angle = 6.0
+
+pixel_width_of_screen = 1920 # pixels
+width_of_screen = 143.51 # centimeters
+
+pixel_height_of_screen = 1080 # pixels
+distance_from_screen = 177.8 # centimeters (65 in.)
+
+### END EXPERIMENTAL CONSTANTS ###
+
+### CALCULATIONS OF OTHER EXPERIMENTAL CONSTANTS ###
+cm_per_pixel = (width_of_screen / pixel_width_of_screen) # units: cm/pixel
+
+foveal_radius = 9.32 # should be calculated by hand on a calculator: r = dist * tan(f_r / 2)
+max_image_width = 2*foveal_radius
+
+peripheral_radius = 20.0
+### END CALCULATIONS OF OTHER EXPERIMENTAL CONSTANTS ###
 
 # Relative directories containing the emotive images.
 neutralDir = 'images\\neutral\\'
